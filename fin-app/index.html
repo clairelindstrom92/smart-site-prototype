@@ -242,6 +242,42 @@ details.folder ul.tasks { border: 0; box-shadow: none; }
 .ask-out .tip { margin: 0; font-size: 13px; color: var(--note-ink); background: var(--note); padding: 6px 8px; }
 .ask-out .small { margin: 0; font-size: 11px; color: var(--muted); }
 
+.split.three { grid-template-columns: repeat(3, 1fr); }
+.split.three .num { font-size: 22px; }
+.acct-sum { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.acct-sum .sub2 { font-family: var(--f-body); font-size: 12px; color: var(--muted); }
+.acct-amt { font-family: var(--f-num); font-size: 22px; line-height: 1; text-align: right; }
+.acct-amt small { display: block; font-family: var(--f-pixel); font-size: 11px; color: var(--muted); }
+.acct-items { list-style: none; margin: 0; padding: 0; }
+.acct-items li { padding: 8px 10px; border-top: 1px dashed var(--lo); display: flex; flex-direction: column; gap: 3px; }
+.acct-items li:first-child { border-top: 0; }
+.acct-items .ln { display: flex; justify-content: space-between; gap: 10px; }
+.acct-items .ln b { font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.acct-items .ln .a { font-family: var(--f-num); font-size: 19px; flex: none; }
+.acct-items .act { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.pill.ok { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cal-title { font-family: var(--f-pixel); font-weight: 600; font-size: 20px; margin: 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.cal-dow { font-family: var(--f-pixel); font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
+.cal-day { min-height: 46px; padding: 3px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; cursor: pointer;
+  font: inherit; color: var(--ink); background: var(--win); border: 1px solid var(--lo); border-radius: 3px; text-align: left; }
+.cal-day .n { font-family: var(--f-num); font-size: 17px; line-height: 1; }
+.cal-day .dots { display: flex; flex-wrap: wrap; gap: 2px; }
+.cal-day.out { opacity: .35; }
+.cal-day.today { border: 2px solid var(--accent); }
+.cal-day.today .n { color: var(--accent); }
+.cal-day.sel { background: var(--bar); box-shadow: inset 2px 2px 0 var(--lo); }
+.cal-day .amt { font-family: var(--f-num); font-size: 13px; line-height: 1; color: var(--bad); }
+.dot.bill { background: var(--accent); } .dot.pay { background: var(--good); } .dot.task { background: var(--title-a); } .dot.other { background: var(--warn); }
+.cal-day .dot { width: 7px; height: 7px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+.legend span { display: flex; align-items: center; gap: 5px; }
+.small-empty { padding: 8px; font-size: 13px; }
+.day-list a, #soon-list a { color: var(--accent); font-size: 12px; font-weight: 700; }
+.rows .ev-kind { display: inline-block; margin-right: 6px; }
+
 /* sticky note */
 .note { align-self: flex-start; transform: rotate(-3deg); background: var(--note); color: var(--note-ink);
   font-family: var(--f-pixel); font-size: 16px; line-height: 1.2; padding: 12px 14px 14px; width: 150px;
@@ -308,7 +344,8 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
   border: 2px solid var(--edge); border-radius: 4px; background: var(--win-2); box-shadow: inset 2px 2px 0 var(--lo); white-space: nowrap; }
 .badge { font-family: var(--f-num); font-size: 15px; line-height: 1; background: var(--bad); color: #fff; padding: 1px 5px; border-radius: 3px; }
 .badge[hidden] { display: none; }
-@media (max-width: 360px) { .start { display: none; } }
+@media (max-width: 520px) { .start { display: none; } }
+@media (max-width: 400px) { .clock { display: none; } .tab { font-size: 14px; gap: 4px; } }
 
 /* ---------- "tiny progress detected" pop-up ---------- */
 .yay-back { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(60, 40, 100, .25);
@@ -458,12 +495,59 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
         <div id="alerts"></div>
       </div>
 
+      <div class="win" id="open-accts">
+        <div class="titlebar"><svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#fff" d="M0 1h8v6H0zm1 2v1h6V3z" fill-rule="evenodd"/></svg><span class="t">Open Accounts</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
+        <div class="win-body">
+          <p class="msg" id="acct-msg" hidden></p>
+          <div class="split three" id="acct-totals" hidden>
+            <div><span class="label">Due next 30 days</span><span class="num" id="acct-due30"></span></div>
+            <div><span class="label">Other balances</span><span class="num" id="acct-bal"></span></div>
+            <div><span class="label">Amount unknown</span><span class="num" id="acct-unknown"></span></div>
+          </div>
+          <div class="folders" id="acct-list2"></div>
+          <p class="foot"><span id="acct-synced"></span> · <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1goTlUKRZcXMnd01KvIJFLuQyNHqvBzaoug4D79gdbpg/edit" target="_blank" rel="noopener">Open the bills tracker</a></p>
+        </div>
+      </div>
+
       <div class="win" id="acct-panel">
-        <div class="titlebar"><span class="t">My Accounts</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
+        <div class="titlebar"><span class="t">Bank &amp; cards</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
         <ul class="rows" id="acct-list"></ul>
       </div>
 
       <p class="foot" id="asof"></p>
+    </div>
+  </section>
+
+  <section id="view-calendar" class="stack" aria-labelledby="tab-calendar" hidden>
+    <div class="win">
+      <div class="titlebar"><svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#fff" d="M0 1h8v7H0zm1 2v4h6V3z" fill-rule="evenodd"/></svg><span class="t">bills_calendar.cal</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <div class="win-body">
+        <div class="cal-head">
+          <button class="chip" id="cal-prev" type="button" aria-label="Previous month">◀</button>
+          <h2 class="cal-title" id="cal-title"></h2>
+          <button class="chip" id="cal-next" type="button" aria-label="Next month">▶</button>
+        </div>
+        <p class="msg" id="cal-msg" hidden></p>
+        <div class="cal-grid" id="cal-grid" role="grid"></div>
+        <div class="legend"><span><i class="dot bill"></i>Bill</span><span><i class="dot pay"></i>Payday</span><span><i class="dot task"></i>Task due</span><span><i class="dot other"></i>Other reminder</span></div>
+      </div>
+    </div>
+
+    <div class="win">
+      <div class="titlebar"><span class="t" id="day-title">Selected day</span><span class="wbtns" aria-hidden="true"><span>×</span></span></div>
+      <div class="win-body">
+        <ul class="rows day-list" id="day-list"></ul>
+        <p class="empty small-empty" id="day-empty">Nothing due this day ♡</p>
+      </div>
+    </div>
+
+    <div class="win">
+      <div class="titlebar"><span class="t">Coming up: next 14 days</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
+      <div class="win-body">
+        <ul class="rows" id="soon-list"></ul>
+        <p class="empty small-empty" id="soon-empty">No bills in the next 14 days.</p>
+        <p class="foot"><span id="cal-synced"></span> · <a class="sheet-link" href="https://calendar.google.com/calendar/r" target="_blank" rel="noopener">Open Google Calendar</a></p>
+      </div>
     </div>
   </section>
 </div>
@@ -490,6 +574,10 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     <button class="tab" id="tab-budget" role="tab" aria-selected="false" data-view="budget">
       <svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1h2v1H3v1h3v1h1v2H6v1H5v1H3V7H1V6h4V5H2V4H1V2h1V1h1z"/></svg>
       Budget <span class="badge" id="budget-badge" hidden>!</span>
+    </button>
+    <button class="tab" id="tab-calendar" role="tab" aria-selected="false" data-view="calendar">
+      <svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M0 1h8v7H0zm1 2v4h6V3zM2 4h1v1H2zm2 0h1v1H4z" fill-rule="evenodd"/></svg>
+      Calendar
     </button>
     <span class="clock" id="clock" aria-hidden="true"></span>
   </div>
@@ -558,12 +646,16 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     for (const t of document.querySelectorAll(".tab")) t.setAttribute("aria-selected", String(t.dataset.view === view));
     $("view-tasks").hidden = view !== "tasks";
     $("view-budget").hidden = view !== "budget";
+    $("view-calendar").hidden = view !== "calendar";
+    if (view === "calendar" && typeof startCalendar === "function") startCalendar();
     try { localStorage.setItem("fin.view", view); } catch (e) {}
   }
   for (const t of document.querySelectorAll(".tab")) t.addEventListener("click", () => show(t.dataset.view));
   let initial = location.hash.replace("#", "");
-  if (initial !== "tasks" && initial !== "budget") { try { initial = localStorage.getItem("fin.view") || "tasks"; } catch (e) { initial = "tasks"; } }
-  show(initial === "budget" ? "budget" : "tasks");
+  const VIEWS = ["tasks", "budget", "calendar"];
+  if (!VIEWS.includes(initial)) { try { initial = localStorage.getItem("fin.view") || "tasks"; } catch (e) { initial = "tasks"; } }
+  let pendingView = VIEWS.includes(initial) ? initial : "tasks";
+  show(pendingView === "calendar" ? "tasks" : pendingView);
 
   /* ---------- tasks: live from the "Fin To-Do Tracker" Google Sheet ---------- */
   const SHEETS = "Google Sheets";
@@ -795,6 +887,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     $("toggle-done").hidden = done.length === 0;
     $("toggle-done").textContent = (showDone ? "Hide" : "Show") + " completed (" + done.length + ")";
     $("done-list").hidden = !showDone || done.length === 0;
+    if (typeof calStarted !== "undefined" && calStarted) renderCalendar();
     const urgent = open.filter((t) => t.priority === "high").length;
     $("tasks-badge").hidden = urgent === 0;
     $("tasks-badge").textContent = urgent;
@@ -926,6 +1019,204 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     $("budget-badge").hidden = !(gap < 0 || alerts.some((a) => a.priority === "high"));
   }
 
+  /* ---------- open accounts (live from the Bills & Cash Tracker) ---------- */
+  const TRACKER_ID = "1goTlUKRZcXMnd01KvIJFLuQyNHqvBzaoug4D79gdbpg";
+  const toNum = (v) => { const n = parseFloat(String(v || "").replace(/[^0-9.\-]/g, "")); return isFinite(n) ? n : null; };
+  function billKind(status) {
+    const st = String(status || "").toLowerCase();
+    if (/^(paid|submitted|confirmed|included)/.test(st)) return "paid";
+    if (/reserve|payroll/.test(st)) return "skip";
+    if (/paused/.test(st)) return "paused";
+    if (/balance only/.test(st)) return "balance";
+    if (/needs info/.test(st)) return "unknown";
+    if (/verify|dispute|returned/.test(st)) return "check";
+    return "due";
+  }
+  const payeeName = (p) => String(p || "").replace(/\s*\(.*?\)\s*/g, " ").replace(/\s+[—-].*$/, "").trim() || "Other";
+  let bills = [];
+  function renderAccounts() {
+    const now = startOfDay(new Date()), in30 = new Date(now.getTime() + 30 * DAY);
+    const groups = new Map();
+    for (const b of bills) {
+      if (b.kind === "paid" || b.kind === "skip") continue;
+      const k = payeeName(b.payee);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(b);
+    }
+    let due30 = 0, bal = 0, unknown = 0;
+    const accts = [...groups.entries()].map(([name, items]) => {
+      const dueItems = items.filter((b) => b.kind === "due" && b.amount != null);
+      const due = dueItems.reduce((s, b) => s + b.amount, 0);
+      const next = dueItems.filter((b) => b.date).sort((a, b) => a.date - b.date)[0] || null;
+      const balance = items.filter((b) => b.kind === "balance" && b.amount != null).reduce((s, b) => s + b.amount, 0);
+      due30 += dueItems.filter((b) => b.date && b.date <= in30).reduce((s, b) => s + b.amount, 0);
+      bal += balance;
+      unknown += items.filter((b) => b.kind === "unknown" || (b.kind === "due" && b.amount == null)).length;
+      return { name, items, due, next, balance };
+    }).sort((a, b) => ((a.next && a.next.date) || Infinity) - ((b.next && b.next.date) || Infinity) || b.due - a.due);
+    $("acct-totals").hidden = accts.length === 0;
+    $("acct-due30").textContent = money(due30);
+    $("acct-bal").textContent = money(bal);
+    $("acct-unknown").textContent = unknown + (unknown === 1 ? " bill" : " bills");
+    $("acct-list2").replaceChildren(...accts.map((a) => {
+      const det = document.createElement("details");
+      const soon = a.next && a.next.date && daysUntil(a.next.date) <= 3;
+      det.className = "folder" + (soon ? " hot" : "");
+      const sm = document.createElement("summary");
+      sm.innerHTML = folderIcon(soon);
+      const sum = el("span", "acct-sum");
+      sum.append(el("span", "fname", a.name));
+      const subTxt = a.next ? "Next: " + money(a.next.amount) + " · " + fmtDay(a.next.date)
+        : a.balance ? "Balance owed, nothing scheduled" : a.items.some((b) => b.kind === "paused") ? "Paused" : a.items.some((b) => b.kind === "check") ? "Check before paying" : "Amount not known yet";
+      sum.append(el("span", "sub2", subTxt));
+      const amt = el("span", "acct-amt", a.due ? money(a.due) : a.balance ? money(a.balance) : "—");
+      amt.append(el("small", null, a.due ? "due" : a.balance ? "balance" : ""));
+      sm.append(sum, amt);
+      det.append(sm);
+      const ul = el("ul", "acct-items");
+      for (const b of a.items.slice().sort((x, y) => (x.date || Infinity) - (y.date || Infinity))) {
+        const li = el("li");
+        const ln = el("div", "ln");
+        ln.append(el("b", null, b.item || b.payee), el("span", "a", b.amount != null ? money(b.amount) : "?"));
+        const meta = el("div", "t-meta");
+        const KIND = { due: ["pill", "Due"], balance: ["pill warn", "Balance"], unknown: ["pill warn", "Needs info"], check: ["pill warn", "Check first"], paused: ["pill ok", "Paused"] };
+        const [cls, label] = KIND[b.kind] || ["pill", b.status];
+        meta.append(el("span", "pill " + cls, label));
+        if (b.date) meta.append(el("span", "pill" + (b.date < now && b.kind === "due" ? " over" : ""), (b.date < now && b.kind === "due" ? "Was due " : "Due ") + fmtDay(b.date)));
+        meta.append(el("span", "pill bot", b.id));
+        li.append(ln, meta);
+        if (b.action) li.append(el("div", "act", b.action));
+        ul.append(li);
+      }
+      det.append(ul);
+      return det;
+    }));
+  }
+  function startAccounts() {
+    mcp.watchTool(SHEETS, "get_values", { spreadsheetId: TRACKER_ID, range: "Bills!A2:L" }, (ev) => {
+      if (ev.type === "data") {
+        bills = (((ev.result.payload || {}).values) || []).filter((r) => r[1]).map((r) => ({
+          id: r[0], payee: r[1], item: r[2], amount: toNum(r[3]), date: dueDate(r[4]), status: r[6], kind: billKind(r[6]), action: r[8],
+        }));
+        $("acct-msg").hidden = true;
+        const at = (ev.result.cache && ev.result.cache.storedAt) || Date.now();
+        $("acct-synced").textContent = "Live from your bills tracker · " + new Date(at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+        renderAccounts();
+        if (calStarted) renderCalendar();
+      } else {
+        $("acct-msg").textContent = explain(ev.error).replace("your tasks", "your accounts").replace("task sheet", "bills tracker");
+        $("acct-msg").hidden = false;
+        if (retract(ev.error && ev.error.code)) { bills = []; renderAccounts(); }
+      }
+    }, { refetchInterval: 120000 });
+  }
+
+  /* ---------- calendar (live from Google Calendar) ---------- */
+  const CAL = "Google Calendar";
+  let calStarted = false, calMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1), calSel = startOfDay(new Date());
+  const events = new Map(); // "YYYY-MM" -> [{date, title, desc, link, kind}]
+  const unwatch = {};
+  const ymKey = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  const isoLocal = (d) => ymKey(d) + "-" + String(d.getDate()).padStart(2, "0");
+  const sameDay = (a, b) => a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  function evKind(title) {
+    if (/\[FIN\]\s*Bill:/i.test(title)) return "bill";
+    if (/payday/i.test(title)) return "pay";
+    if (/\$\d|due|rent|debit/i.test(title)) return "bill";
+    return "other";
+  }
+  function evDate(e) {
+    const st = e.start || {};
+    if (st.date) return parseDate(String(st.date).slice(0, 10));
+    if (st.dateTime) return new Date(st.dateTime);
+    return null;
+  }
+  function watchMonth(m) {
+    const key = ymKey(m);
+    if (unwatch[key]) return;
+    const next = new Date(m.getFullYear(), m.getMonth() + 1, 1);
+    unwatch[key] = mcp.watchTool(CAL, "list_events", {
+      fullText: "[FIN]", startTime: isoLocal(m) + "T00:00:00", endTime: isoLocal(next) + "T00:00:00", orderBy: "startTime", pageSize: 250,
+    }, (ev) => {
+      if (ev.type === "data") {
+        const list = (((ev.result.payload || {}).events) || []).map((e) => {
+          const title = String(e.summary || "").replace(/^\[FIN\]\s*/, "").replace(/^Bill:\s*/, "");
+          return { date: evDate(e), title, desc: e.description || "", link: e.htmlLink || "", kind: evKind(e.summary || "") };
+        }).filter((e) => e.date);
+        events.set(key, list);
+        $("cal-msg").hidden = true;
+        $("cal-synced").textContent = "Live from Google Calendar";
+        renderCalendar();
+      } else {
+        $("cal-msg").textContent = explain(ev.error).replace(/Google Sheets/g, "Google Calendar").replace("your tasks", "your bill calendar").replace("task sheet", "calendar");
+        $("cal-msg").hidden = false;
+        if (retract(ev.error && ev.error.code)) { events.delete(key); renderCalendar(); }
+      }
+    }, { refetchInterval: 300000 });
+  }
+  function itemsOn(d) {
+    const evs = (events.get(ymKey(d)) || []).filter((e) => sameDay(e.date, d));
+    const due = tasks.filter((t) => !t.done && sameDay(dueDate(t.due), d)).map((t) => ({ date: d, title: t.text, kind: "task" }));
+    return [...evs, ...due];
+  }
+  function evRow(e, showDate) {
+    const li = el("li");
+    const l = el("div", "l");
+    const t = el("div");
+    t.append(el("i", "dot ev-kind " + e.kind), document.createTextNode(e.title));
+    l.append(t);
+    const sub = [showDate ? fmtDay(e.date) : "", e.kind === "task" ? "Task due" : e.desc].filter(Boolean).join(" · ");
+    if (sub) l.append(el("div", "sub", sub.length > 160 ? sub.slice(0, 157) + "…" : sub));
+    li.append(l);
+    if (e.link) { const a = el("a", null, "Open"); a.href = e.link; a.target = "_blank"; a.rel = "noopener"; const r = el("div", "r"); r.append(a); li.append(r); }
+    return li;
+  }
+  function renderCalendar() {
+    const m = calMonth;
+    $("cal-title").textContent = m.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const cells = ["S", "M", "T", "W", "T", "F", "S"].map((d) => el("div", "cal-dow", d));
+    const first = new Date(m.getFullYear(), m.getMonth(), 1);
+    const start = new Date(first); start.setDate(1 - first.getDay());
+    const today = startOfDay(new Date());
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      if (i >= 35 && d.getMonth() !== m.getMonth()) break;
+      const items = d.getMonth() === m.getMonth() ? itemsOn(d) : [];
+      const b = el("button", "cal-day" + (d.getMonth() !== m.getMonth() ? " out" : "") + (sameDay(d, today) ? " today" : "") + (sameDay(d, calSel) ? " sel" : ""));
+      b.type = "button";
+      b.append(el("span", "n", String(d.getDate())));
+      const dots = el("span", "dots");
+      for (const it of items.slice(0, 6)) dots.append(el("i", "dot " + it.kind));
+      b.append(dots);
+      const amt = items.filter((x) => x.kind === "bill").map((x) => toNum((x.title.match(/\$[\d,]+(\.\d+)?/) || [])[0])).filter((x) => x).reduce((s, x) => s + x, 0);
+      if (amt) b.append(el("span", "amt", "$" + Math.round(amt)));
+      b.setAttribute("aria-label", d.toDateString() + (items.length ? ", " + items.length + " items" : ""));
+      b.addEventListener("click", () => { calSel = d; if (d.getMonth() !== m.getMonth()) { calMonth = new Date(d.getFullYear(), d.getMonth(), 1); watchMonth(calMonth); } renderCalendar(); });
+      cells.push(b);
+    }
+    $("cal-grid").replaceChildren(...cells);
+    const dayItems = itemsOn(calSel);
+    $("day-title").textContent = calSel.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+    $("day-list").replaceChildren(...dayItems.map((e) => evRow(e, false)));
+    $("day-empty").hidden = dayItems.length > 0;
+    const soon = [];
+    for (let i = 0; i < 14; i++) { const d = new Date(today); d.setDate(today.getDate() + i); soon.push(...itemsOn(d).filter((x) => x.kind === "bill" || x.kind === "pay")); }
+    $("soon-list").replaceChildren(...soon.map((e) => evRow(e, true)));
+    $("soon-empty").hidden = soon.length > 0;
+  }
+  function startCalendar() {
+    if (!mcp) { $("cal-msg").textContent = explain({ code: "not_granted" }); $("cal-msg").hidden = false; return; }
+    if (!calStarted) {
+      calStarted = true;
+      const t = new Date();
+      watchMonth(calMonth);
+      watchMonth(new Date(t.getFullYear(), t.getMonth() + 1, 1));
+    }
+    renderCalendar();
+  }
+  $("cal-prev").addEventListener("click", () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1); watchMonth(calMonth); renderCalendar(); });
+  $("cal-next").addEventListener("click", () => { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1); watchMonth(calMonth); renderCalendar(); });
+
   /* ---------- connect ---------- */
   function refresh() {
     if (mcp && mcp.invalidate) mcp.invalidate(SHEETS, "get_values", { spreadsheetId: SHEET_ID, range: READ_RANGE }).catch(() => {});
@@ -957,6 +1248,8 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
         }
         $("add-btn").disabled = !canAdd();
       }, { refetchInterval: 60000 });
+      startAccounts();
+      if (pendingView === "calendar") show("calendar");
     }
     sample = claude ? await claude.use("sample") : null;
     renderTasks();
