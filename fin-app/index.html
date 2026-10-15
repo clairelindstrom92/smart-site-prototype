@@ -5,252 +5,402 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=VT323&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap">
 <style>
-/* Layout: one-column phone app; sticky header, content, fixed bottom tab bar. Passbook ink on cool paper. */
+/* Layout: a dreamy pastel desktop (Fin OS 2.0). Every section is a little beveled window; a "start" taskbar holds the tabs and a clock. */
 :root {
-  --bg: #eef1f5;
-  --surface: #ffffff;
-  --ink: #16202e;
-  --muted: #5d6a7c;
-  --line: #d6dce5;
-  --accent: #2346c2;
-  --accent-soft: #e2e8fb;
-  --bad: #c0362c;
-  --bad-soft: #fbe5e2;
-  --warn: #9a6200;
-  --warn-soft: #fbefd6;
-  --good: #1d7a4c;
-  --good-soft: #dcf2e6;
-  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
-  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-num: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --sky-a: #b8b2f6;
+  --sky-b: #f3c4e6;
+  --sky-c: #fde3ef;
+  --hill: #bfe7c8;
+  --hill-2: #a6dbb6;
+  --cloud: #ffffff;
+  --win: #fff6fa;
+  --win-2: #fde9f3;
+  --title-a: #a596f2;
+  --title-b: #f2a2d0;
+  --title-ink: #ffffff;
+  --ink: #4b3a6e;
+  --muted: #8c7cab;
+  --hi: #ffffff;
+  --lo: #b9a6da;
+  --edge: #7c6bb5;
+  --accent: #e8609f;
+  --accent-ink: #ffffff;
+  --bad: #db3f78;
+  --bad-soft: #ffe1ed;
+  --warn: #b77700;
+  --warn-soft: #fff1c7;
+  --good: #2f9a6a;
+  --good-soft: #d9f4e4;
+  --bar: #ddd6fb;
+  --note: #ffd6e4;
+  --note-ink: #9b4a6b;
+  --f-pixel: "Pixelify Sans", "Silkscreen", "Courier New", monospace;
+  --f-num: "VT323", "Courier New", ui-monospace, monospace;
+  --f-body: "M PLUS Rounded 1c", "Nunito", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0d131c; --surface: #161e2a; --ink: #e8edf4; --muted: #95a2b5; --line: #273244;
-    --accent: #8ea6ff; --accent-soft: #1f2a4a;
-    --bad: #ff8a7d; --bad-soft: #3a1c1a; --warn: #f2b955; --warn-soft: #382a10;
-    --good: #6fd3a0; --good-soft: #13301f;
+    --sky-a: #241f52; --sky-b: #47356f; --sky-c: #5a3f6e; --hill: #2f5a4c; --hill-2: #264b40; --cloud: #6c5a9a;
+    --win: #2c2550; --win-2: #372e60; --title-a: #7b69d6; --title-b: #c35b9c; --title-ink: #fff4fb;
+    --ink: #f6edff; --muted: #bcaedd; --hi: #5c4e94; --lo: #17122f; --edge: #0d0a1f;
+    --accent: #ff8cc4; --accent-ink: #2a1838;
+    --bad: #ff7ca5; --bad-soft: #4a2142; --warn: #ffd27a; --warn-soft: #463812; --good: #7fe0ad; --good-soft: #1d3b30;
+    --bar: #3a3166; --note: #5b3655; --note-ink: #ffd0e4;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0d131c; --surface: #161e2a; --ink: #e8edf4; --muted: #95a2b5; --line: #273244;
-  --accent: #8ea6ff; --accent-soft: #1f2a4a;
-  --bad: #ff8a7d; --bad-soft: #3a1c1a; --warn: #f2b955; --warn-soft: #382a10;
-  --good: #6fd3a0; --good-soft: #13301f;
+  --sky-a: #241f52; --sky-b: #47356f; --sky-c: #5a3f6e; --hill: #2f5a4c; --hill-2: #264b40; --cloud: #6c5a9a;
+  --win: #2c2550; --win-2: #372e60; --title-a: #7b69d6; --title-b: #c35b9c; --title-ink: #fff4fb;
+  --ink: #f6edff; --muted: #bcaedd; --hi: #5c4e94; --lo: #17122f; --edge: #0d0a1f;
+  --accent: #ff8cc4; --accent-ink: #2a1838;
+  --bad: #ff7ca5; --bad-soft: #4a2142; --warn: #ffd27a; --warn-soft: #463812; --good: #7fe0ad; --good-soft: #1d3b30;
+  --bar: #3a3166; --note: #5b3655; --note-ink: #ffd0e4;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { min-height: 100%; }
 body {
-  background: var(--bg); color: var(--ink);
+  background: var(--sky-a);
+  color: var(--ink);
   font-family: var(--f-body); font-size: 15px; line-height: 1.45;
   -webkit-tap-highlight-color: transparent;
 }
+/* the desktop wallpaper: sky, clouds, sparkles, hills */
+.wallpaper { position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  background: linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 55%, var(--sky-c) 78%, var(--hill) 78.2%, var(--hill-2) 100%); }
+.wallpaper::before { content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(60px 22px at 14% 12%, var(--cloud) 98%, transparent 100%),
+    radial-gradient(40px 18px at 20% 10%, var(--cloud) 98%, transparent 100%),
+    radial-gradient(70px 24px at 78% 22%, var(--cloud) 98%, transparent 100%),
+    radial-gradient(44px 18px at 71% 20%, var(--cloud) 98%, transparent 100%),
+    radial-gradient(56px 20px at 40% 46%, var(--cloud) 98%, transparent 100%),
+    radial-gradient(50% 30% at 20% 100%, var(--hill-2) 98%, transparent 100%),
+    radial-gradient(60% 34% at 90% 102%, var(--hill-2) 98%, transparent 100%);
+  opacity: .85; }
+.spark { position: absolute; font-family: var(--f-pixel); color: var(--cloud); opacity: .9; font-size: 14px; }
+.moon { position: absolute; right: 9%; top: 6%; width: 34px; height: 34px; border-radius: 50%;
+  box-shadow: 9px -4px 0 0 #fff2b3; transform: rotate(-20deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .spark { animation: twinkle 3.2s ease-in-out infinite; }
+  .spark:nth-child(2n) { animation-delay: 1.4s; }
+  @keyframes twinkle { 50% { opacity: .25; transform: scale(.8); } }
+}
+
 .wrap {
   max-width: 560px; margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px));
+  padding-block: 14px calc(84px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 16px;
 }
-header.top {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
-  background: var(--bg);
-  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-  padding-block: 18px 12px;
-}
-.brand { font-family: var(--f-display); font-weight: 800; font-size: 30px; letter-spacing: -0.02em; margin: 0; }
-.brand span { color: var(--accent); }
-.today { color: var(--muted); font-size: 13px; }
-h2 { font-family: var(--f-display); font-weight: 600; font-size: 20px; margin: 0; text-wrap: balance; }
-.label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+section[hidden] { display: none !important; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
 .num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
-section[hidden] { display: none; }
-.stack { display: flex; flex-direction: column; gap: 14px; }
+.label { font-family: var(--f-pixel); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 
-/* ---------- Tasks ---------- */
-form.add {
-  display: flex; flex-direction: column; gap: 10px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
+/* ---------- window chrome ---------- */
+.win {
+  background: var(--win);
+  border: 2px solid var(--edge);
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), 4px 4px 0 rgba(75, 58, 110, .18);
+  border-radius: 6px; overflow: hidden;
 }
-.add-row { display: flex; gap: 8px; }
-#task-text {
-  flex: 1; min-width: 0; font: inherit; color: var(--ink); background: transparent;
-  border: 0; outline: none; padding: 8px 4px; font-size: 16px;
+.win[hidden] { display: none; }
+.titlebar {
+  display: flex; align-items: center; gap: 8px; padding: 5px 6px 5px 10px;
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  color: var(--title-ink); font-family: var(--f-pixel); font-size: 15px; letter-spacing: .02em;
+  border-bottom: 2px solid var(--edge);
 }
+.titlebar .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titlebar .ico { flex: none; width: 16px; height: 16px; image-rendering: pixelated; }
+.wbtns { display: flex; gap: 3px; flex: none; }
+.wbtns span {
+  width: 18px; height: 16px; display: grid; place-items: center; font-size: 11px; line-height: 1;
+  background: var(--win); color: var(--ink); border: 1px solid var(--edge);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--lo);
+}
+.win-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.menubar { display: flex; gap: 14px; padding: 3px 10px; font-family: var(--f-pixel); font-size: 12px; color: var(--muted);
+  background: var(--win-2); border-bottom: 1px solid var(--lo); }
+.menubar u { text-decoration-thickness: 1px; }
+
+/* ---------- header window ---------- */
+.hello .win-body { flex-direction: row; align-items: center; gap: 12px; }
+.hello h1 { font-family: var(--f-pixel); font-weight: 700; font-size: 30px; line-height: 1; margin: 0; color: var(--accent); text-shadow: 2px 2px 0 var(--lo); }
+.hello .sub { font-size: 13px; color: var(--muted); }
+.hello .grow { flex: 1; min-width: 0; }
+
+/* ---------- beveled controls ---------- */
 .btn {
-  font: inherit; font-weight: 600; border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
-  background: var(--accent); color: var(--surface);
+  font-family: var(--f-pixel); font-size: 15px; cursor: pointer; padding: 7px 14px; color: var(--accent-ink);
+  background: var(--accent); border: 2px solid var(--edge); border-radius: 4px;
+  box-shadow: inset 2px 2px 0 rgba(255,255,255,.45), inset -2px -2px 0 rgba(0,0,0,.18);
 }
-.btn:disabled { opacity: .45; cursor: default; }
-.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn:active { box-shadow: inset -2px -2px 0 rgba(255,255,255,.45), inset 2px 2px 0 rgba(0,0,0,.18); }
+.btn:disabled { opacity: .5; cursor: default; }
+form.add .add-row { display: flex; gap: 8px; }
+#task-text {
+  flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); background: var(--win);
+  border: 2px solid var(--edge); border-radius: 3px; padding: 7px 9px; outline: none;
+  box-shadow: inset 2px 2px 0 var(--lo), inset -1px -1px 0 var(--hi);
+}
+#task-text::placeholder { color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chips .label { margin-right: 2px; }
 .chip {
-  font: inherit; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--line); background: transparent; color: var(--muted);
+  font-family: var(--f-pixel); font-size: 13px; padding: 4px 10px; cursor: pointer; border-radius: 3px;
+  color: var(--ink); background: var(--win-2); border: 1px solid var(--edge);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--lo);
 }
-.chip[aria-pressed="true"][data-p="high"] { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
-.chip[aria-pressed="true"][data-p="normal"] { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
-.chip[aria-pressed="true"][data-p="low"] { background: var(--line); color: var(--ink); border-color: transparent; }
-.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
-.bar { flex: 1; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.bar > i { display: block; height: 100%; background: var(--good); width: 0; transition: width .3s; }
-ul.tasks { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.chip[aria-pressed="true"] { box-shadow: inset 1px 1px 0 var(--lo), inset -1px -1px 0 var(--hi); }
+.chip[aria-pressed="true"][data-p="high"] { background: var(--bad-soft); color: var(--bad); }
+.chip[aria-pressed="true"][data-p="normal"] { background: var(--bar); }
+.chip[aria-pressed="true"][data-p="low"] { background: var(--good-soft); color: var(--good); }
+
+/* ---------- progress (segmented, like a file copy) ---------- */
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.progress[hidden] { display: none; }
+.prog-row { display: flex; justify-content: space-between; gap: 8px; font-family: var(--f-pixel); font-size: 13px; }
+.bar { height: 20px; padding: 2px; background: var(--win); border: 2px solid var(--edge);
+  box-shadow: inset 2px 2px 0 var(--lo); }
+.bar > i { display: block; height: 100%; width: 0; transition: width .4s steps(8);
+  background: repeating-linear-gradient(90deg, var(--accent) 0 10px, transparent 10px 13px); }
+
+/* ---------- task list ---------- */
+ul.tasks { list-style: none; margin: 0; padding: 0; background: var(--win); border: 2px solid var(--edge);
+  box-shadow: inset 2px 2px 0 var(--lo); }
 ul.tasks:empty { display: none; }
-li.task { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-top: 1px solid var(--line); }
+ul.tasks[hidden] { display: none; }
+li.task { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border-top: 1px dashed var(--lo); }
 li.task:first-child { border-top: 0; }
-li.task[data-p="high"] { box-shadow: inset 3px 0 0 var(--bad); }
+li.task:nth-child(2n) { background: var(--win-2); }
 .check {
-  flex: none; width: 24px; height: 24px; border-radius: 7px; margin-top: 1px; cursor: pointer;
-  border: 2px solid var(--muted); background: transparent; display: grid; place-items: center; padding: 0;
+  flex: none; width: 24px; height: 24px; margin-top: 1px; padding: 0; cursor: pointer; display: grid; place-items: center;
+  background: var(--win); border: 2px solid var(--edge); border-radius: 3px;
+  box-shadow: inset 2px 2px 0 var(--lo);
 }
 .check svg { width: 14px; height: 14px; opacity: 0; }
-li.task.done .check { background: var(--good); border-color: var(--good); }
+li.task.done .check { background: var(--accent); box-shadow: inset 2px 2px 0 rgba(255,255,255,.4); }
 li.task.done .check svg { opacity: 1; }
+.check:disabled { opacity: .6; }
 .t-body { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-li.task.done .t-text { color: var(--muted); text-decoration: line-through; }
-.t-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+li.task.done .t-text { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--accent); }
+.t-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.pill { font-family: var(--f-pixel); font-size: 11px; padding: 1px 7px; border: 1px solid var(--edge); border-radius: 3px;
+  background: var(--bar); color: var(--ink); }
 .pill.high { background: var(--bad-soft); color: var(--bad); }
-.pill.bot { background: var(--line); color: var(--ink); }
-.sheet-link { color: var(--accent); font-weight: 600; }
-.linkbtn { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer; align-self: flex-start; }
-.empty { text-align: center; color: var(--muted); padding: 28px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; }
-.empty b { display: block; color: var(--ink); font-family: var(--f-display); font-size: 17px; margin-bottom: 4px; }
+.pill.bot { background: var(--win-2); color: var(--muted); }
+li.task[data-p="high"]:not(.done) .t-text::before { content: "♥ "; color: var(--bad); }
+.linkbtn { font-family: var(--f-pixel); font-size: 14px; color: var(--accent); background: none; border: 0; padding: 2px 0; cursor: pointer; align-self: flex-start; text-decoration: underline; text-underline-offset: 3px; }
+.linkbtn[hidden] { display: none; }
+.empty { text-align: center; color: var(--muted); padding: 18px 8px; }
+.empty b { display: block; color: var(--ink); font-family: var(--f-pixel); font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.empty[hidden] { display: none; }
+.foot { font-size: 12px; color: var(--muted); text-align: center; margin: 0; }
+.sheet-link { color: var(--accent); font-weight: 700; }
+.msg { margin: 0; font-size: 13px; color: var(--warn); background: var(--warn-soft); padding: 8px 10px; border: 1px solid var(--edge); border-radius: 4px; }
+.msg[hidden] { display: none; }
 
-/* ---------- Budget ---------- */
-.gap-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-.gap-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.big { font-family: var(--f-num); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 40px; line-height: 1.05; letter-spacing: -0.02em; }
+/* sticky note */
+.note { align-self: flex-start; transform: rotate(-3deg); background: var(--note); color: var(--note-ink);
+  font-family: var(--f-pixel); font-size: 16px; line-height: 1.2; padding: 12px 14px 14px; width: 150px;
+  box-shadow: 3px 4px 0 rgba(75, 58, 110, .18); }
+.note::before { content: ""; display: block; width: 46px; height: 12px; margin: -18px auto 8px; background: rgba(255,255,255,.55); }
+
+/* ---------- budget ---------- */
+.dialog .win-body { align-items: stretch; }
+.gap-head { display: flex; gap: 12px; align-items: center; }
+.gap-head .pix { flex: none; width: 48px; height: 48px; image-rendering: pixelated; }
+.gap-head .grow { flex: 1; min-width: 0; }
+.big { font-family: var(--f-num); font-size: 52px; line-height: .9; }
 .big.bad { color: var(--bad); } .big.good { color: var(--good); }
-.status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+.status { font-family: var(--f-pixel); font-size: 13px; padding: 3px 9px; border: 1px solid var(--edge); border-radius: 3px; flex: none; align-self: flex-start; }
 .status.bad { background: var(--bad-soft); color: var(--bad); }
 .status.good { background: var(--good-soft); color: var(--good); }
 .status.warn { background: var(--warn-soft); color: var(--warn); }
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.split > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.split .num { font-size: 18px; font-weight: 600; }
-.meter { position: relative; height: 10px; border-radius: 99px; background: var(--bad-soft); overflow: hidden; }
-.meter > i { position: absolute; inset: 0 auto 0 0; background: var(--good); border-radius: 99px; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-.panel-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 12px 14px 8px; }
+.meter { height: 20px; padding: 2px; background: var(--bad-soft); border: 2px solid var(--edge); box-shadow: inset 2px 2px 0 var(--lo); }
+.meter > i { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--good) 0 10px, transparent 10px 13px); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.split > div { display: flex; flex-direction: column; min-width: 0; padding: 6px 8px; background: var(--win-2); border: 1px solid var(--lo); }
+.split .num { font-size: 26px; line-height: 1; }
 .rows { list-style: none; margin: 0; padding: 0; }
-.rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line); }
+.rows li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 12px; border-top: 1px dashed var(--lo); }
+.rows li:first-child { border-top: 0; }
 .rows .l { min-width: 0; overflow-wrap: anywhere; }
 .rows .sub { font-size: 12px; color: var(--muted); }
 .rows .r { text-align: right; flex: none; }
-.rows .amt { font-family: var(--f-num); font-variant-numeric: tabular-nums; font-weight: 600; }
+.rows .amt { font-family: var(--f-num); font-size: 22px; line-height: 1; }
 .amt.neg { color: var(--bad); }
-.when { font-size: 12px; font-weight: 600; }
+.when { font-family: var(--f-pixel); font-size: 12px; }
 .when.soon, .when.over { color: var(--bad); }
 .when.later { color: var(--muted); }
-.alert { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
-.alert-t { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+.panel-sub { padding: 6px 12px; font-family: var(--f-pixel); font-size: 12px; color: var(--muted); background: var(--win-2); border-bottom: 1px solid var(--lo); }
+.panel-sub:empty { display: none; }
+.alert { padding: 10px 12px; border-top: 1px dashed var(--lo); display: flex; flex-direction: column; gap: 3px; }
+.alert:first-child { border-top: 0; }
+.alert-t { display: flex; gap: 8px; align-items: center; font-weight: 700; }
 .alert p { margin: 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
-.dot.high { background: var(--bad); } .dot.medium { background: var(--warn); } .dot.low { background: var(--muted); } .dot.info { background: var(--accent); }
-.foot { font-size: 12px; color: var(--muted); text-align: center; }
-.stale { background: var(--warn-soft); color: var(--warn); font-size: 13px; font-weight: 600; padding: 8px 12px; border-radius: 10px; }
+.dot { flex: none; width: 10px; height: 10px; background: var(--muted); border: 1px solid var(--edge); }
+.dot.high { background: var(--bad); } .dot.medium { background: var(--warn); } .dot.info { background: var(--title-a); }
 
-/* ---------- Tab bar ---------- */
+/* ---------- taskbar ---------- */
 nav.tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  background: var(--surface); border-top: 1px solid var(--line);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--bar); border-top: 2px solid var(--hi); box-shadow: 0 -2px 0 var(--edge);
+  padding-left: max(8px, env(safe-area-inset-left, 0px));
+  padding-right: max(8px, env(safe-area-inset-right, 0px));
+  padding-block: 6px calc(6px + env(safe-area-inset-bottom, 0px));
 }
-nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-items: stretch; }
+.start { font-family: var(--f-pixel); font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 4px; padding: 0 10px;
+  background: var(--win); border: 2px solid var(--edge); border-radius: 4px; color: var(--accent);
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo); }
 .tab {
-  font: inherit; font-weight: 600; font-size: 14px; color: var(--muted); background: transparent; border: 0;
-  border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  flex: 1; min-width: 0; font-family: var(--f-pixel); font-size: 15px; color: var(--ink); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 6px; white-space: nowrap;
+  background: var(--win); border: 2px solid var(--edge); border-radius: 4px;
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo);
 }
-.tab svg { width: 18px; height: 18px; }
-.tab[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
-.badge { font-family: var(--f-num); font-size: 11px; background: var(--bad); color: var(--surface); border-radius: 99px; padding: 1px 6px; }
+.tab svg { width: 16px; height: 16px; flex: none; }
+.tab[aria-selected="true"] { background: var(--win-2); box-shadow: inset 2px 2px 0 var(--lo), inset -1px -1px 0 var(--hi); color: var(--accent); }
+.clock { font-family: var(--f-num); font-size: 20px; display: flex; align-items: center; padding: 0 10px;
+  border: 2px solid var(--edge); border-radius: 4px; background: var(--win-2); box-shadow: inset 2px 2px 0 var(--lo); white-space: nowrap; }
+.badge { font-family: var(--f-num); font-size: 15px; line-height: 1; background: var(--bad); color: #fff; padding: 1px 5px; border-radius: 3px; }
 .badge[hidden] { display: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.offline { font-size: 13px; color: var(--warn); background: var(--warn-soft); padding: 8px 12px; border-radius: 10px; }
+@media (max-width: 360px) { .start { display: none; } }
+
+/* ---------- "tiny progress detected" pop-up ---------- */
+.yay-back { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(60, 40, 100, .25);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.yay-back[hidden] { display: none; }
+.yay { width: min(300px, 100%); }
+.yay .win-body { align-items: center; text-align: center; gap: 8px; padding: 16px; }
+.yay .cat { width: 84px; height: 72px; image-rendering: pixelated; }
+.yay h2 { font-family: var(--f-pixel); font-weight: 600; font-size: 22px; margin: 0; line-height: 1.15; }
+.yay p { margin: 0; color: var(--muted); font-size: 13px; }
+.yay .btn { min-width: 96px; margin-top: 4px; }
+@media (prefers-reduced-motion: no-preference) {
+  .yay-back:not([hidden]) .yay { animation: pop .28s steps(4); }
+  @keyframes pop { from { transform: scale(.6); opacity: 0; } }
+}
+:focus-visible { outline: 2px dashed var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
-<div class="wrap">
-  <header class="top">
-    <h1 class="brand">Fin<span>.</span></h1>
-    <div class="today" id="today"></div>
-  </header>
+<div class="wallpaper" aria-hidden="true">
+  <span class="moon"></span>
+  <span class="spark" style="left:8%;top:30%">✦</span>
+  <span class="spark" style="left:30%;top:8%">✧</span>
+  <span class="spark" style="left:56%;top:16%">✦</span>
+  <span class="spark" style="left:88%;top:40%">✧</span>
+  <span class="spark" style="left:18%;top:58%">✧</span>
+  <span class="spark" style="left:64%;top:62%">✦</span>
+</div>
 
-  <p class="offline" id="offline" hidden>Can't reach your saved data right now. Open Fin while signed in to claude.ai to see your tasks and budget.</p>
+<div class="wrap">
+  <div class="win hello">
+    <div class="titlebar"><svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#fff" d="M1 1h2v1h2V1h2v3H6v1H5v1H4v1H3V6H2V5H1z"/></svg><span class="t">Fin OS 2.0</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+    <div class="win-body">
+      <h1>Fin<span aria-hidden="true">♡</span></h1>
+      <div class="grow">
+        <div id="today" class="sub"></div>
+        <div class="sub">small steps still count</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="msg" id="offline" hidden>Can't reach your saved data right now. Open Fin while signed in to claude.ai to see your budget.</p>
 
   <!-- ===== TASKS ===== -->
   <section id="view-tasks" class="stack" aria-labelledby="tab-tasks">
-    <form class="add" id="add-form" autocomplete="off">
-      <div class="add-row">
-        <input id="task-text" type="text" placeholder="Add a task…" aria-label="New task" maxlength="200">
-        <button class="btn" id="add-btn" type="submit" disabled>Add</button>
-      </div>
-      <div class="chips" role="group" aria-label="Priority">
-        <button type="button" class="chip" data-p="high" aria-pressed="false">Urgent</button>
-        <button type="button" class="chip" data-p="normal" aria-pressed="true">Normal</button>
-        <button type="button" class="chip" data-p="low" aria-pressed="false">Someday</button>
-      </div>
-    </form>
-
-    <p class="offline" id="sheet-msg" hidden></p>
-
-    <div class="progress" id="progress" hidden>
-      <span id="progress-text"></span>
-      <div class="bar"><i id="progress-bar"></i></div>
+    <div class="win">
+      <div class="titlebar"><span class="t">new_task.txt</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <form class="add win-body" id="add-form" autocomplete="off">
+        <div class="add-row">
+          <input id="task-text" type="text" placeholder="What do you need to do?" aria-label="New task" maxlength="200">
+          <button class="btn" id="add-btn" type="submit" disabled>Add</button>
+        </div>
+        <div class="chips" role="group" aria-label="Priority">
+          <span class="label">Priority</span>
+          <button type="button" class="chip" data-p="high" aria-pressed="false">Urgent</button>
+          <button type="button" class="chip" data-p="normal" aria-pressed="true">Normal</button>
+          <button type="button" class="chip" data-p="low" aria-pressed="false">Someday</button>
+        </div>
+      </form>
     </div>
 
-    <div class="empty" id="tasks-empty">
-      <b>Nothing on your list yet</b>
-      Type a task above and tap Add. Your list lives in the Fin To-Do Tracker sheet, and tasks your finance agents give you show up here too.
+    <div class="win">
+      <div class="titlebar"><svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#fff" d="M1 0h6v8H1zM2 2h4v1H2zm0 2h4v1H2zm0 2h3v1H2z" fill-rule="evenodd"/></svg><span class="t">My To-Dos</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+      <div class="win-body">
+        <p class="msg" id="sheet-msg" hidden></p>
+        <div class="progress" id="progress" hidden>
+          <div class="prog-row"><span id="progress-text"></span><span>♡</span></div>
+          <div class="bar"><i id="progress-bar"></i></div>
+        </div>
+        <div class="empty" id="tasks-empty">
+          <b>Nothing on your list yet</b>
+          Type a task above and tap Add. Your list lives in the Fin To-Do Tracker sheet, and tasks your finance agents give you show up here too.
+        </div>
+        <ul class="tasks" id="open-list"></ul>
+        <button class="linkbtn" id="toggle-done" type="button" hidden></button>
+        <ul class="tasks" id="done-list" hidden></ul>
+        <p class="foot"><span id="synced"></span> · <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo/edit" target="_blank" rel="noopener">Open the sheet</a></p>
+      </div>
     </div>
 
-    <ul class="tasks" id="open-list"></ul>
-    <button class="linkbtn" id="toggle-done" type="button" hidden></button>
-    <ul class="tasks" id="done-list" hidden></ul>
-    <p class="foot"><span id="synced"></span> · <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo/edit" target="_blank" rel="noopener">Open the sheet</a></p>
+    <div class="note">small steps<br>still count ♡</div>
   </section>
 
   <!-- ===== BUDGET ===== -->
   <section id="view-budget" class="stack" aria-labelledby="tab-budget" hidden>
-    <div class="empty" id="budget-empty">
-      <b>Waiting for FinBot's first update</b>
-      Each morning FinBot reads your [FIN] audit emails and tracker, then fills in your cash, bills due before payday and anything urgent here.
+    <div class="win" id="budget-empty">
+      <div class="titlebar"><span class="t">budget.exe</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
+      <div class="win-body empty">
+        <b>Waiting for FinBot's first update</b>
+        Each morning FinBot reads your [FIN] audit emails and tracker, then fills in your cash, bills due before payday and anything urgent here.
+      </div>
     </div>
 
     <div id="budget" class="stack" hidden>
-      <p class="stale" id="stale" hidden></p>
-      <div class="gap-card">
-        <div class="gap-head">
-          <div>
-            <div class="label" id="gap-label">Before payday</div>
-            <div class="big num" id="gap-amt"></div>
+      <p class="msg" id="stale" hidden></p>
+      <div class="win dialog">
+        <div class="titlebar"><span class="t">System Message</span><span class="wbtns" aria-hidden="true"><span>×</span></span></div>
+        <div class="win-body">
+          <div class="gap-head">
+            <svg class="pix" id="gap-pix" viewBox="0 0 12 12" aria-hidden="true"></svg>
+            <div class="grow">
+              <div class="label" id="gap-label">Before payday</div>
+              <div class="big num" id="gap-amt"></div>
+            </div>
+            <span class="status" id="gap-status"></span>
           </div>
-          <span class="status" id="gap-status"></span>
-        </div>
-        <div class="meter" aria-hidden="true"><i id="meter"></i></div>
-        <div class="split">
-          <div><span class="label">Cash available</span><span class="num" id="cash"></span></div>
-          <div><span class="label">Bills due</span><span class="num" id="due-total"></span></div>
+          <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+          <div class="split">
+            <div><span class="label">Cash available</span><span class="num" id="cash"></span></div>
+            <div><span class="label">Bills due</span><span class="num" id="due-total"></span></div>
+          </div>
         </div>
       </div>
 
-      <div class="panel" id="due-panel">
-        <div class="panel-h"><h2>Due before payday</h2><span class="label" id="payday"></span></div>
+      <div class="win" id="due-panel">
+        <div class="titlebar"><span class="t">Due before payday</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
+        <div class="panel-sub" id="payday"></div>
         <ul class="rows" id="due-list"></ul>
       </div>
 
-      <div class="panel" id="alerts-panel">
-        <div class="panel-h"><h2>Needs you</h2></div>
+      <div class="win" id="alerts-panel">
+        <div class="titlebar"><span class="t">Needs you ♡</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
         <div id="alerts"></div>
       </div>
 
-      <div class="panel" id="acct-panel">
-        <div class="panel-h"><h2>Accounts</h2></div>
+      <div class="win" id="acct-panel">
+        <div class="titlebar"><span class="t">My Accounts</span><span class="wbtns" aria-hidden="true"><span>_</span><span>×</span></span></div>
         <ul class="rows" id="acct-list"></ul>
       </div>
 
@@ -259,16 +409,30 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
   </section>
 </div>
 
+<div class="yay-back" id="yay" hidden>
+  <div class="win yay" role="dialog" aria-modal="true" aria-labelledby="yay-title">
+    <div class="titlebar"><span class="t">System Message</span><span class="wbtns" aria-hidden="true"><span>×</span></span></div>
+    <div class="win-body">
+      <svg class="cat" id="yay-cat" viewBox="0 0 14 12" aria-hidden="true"></svg>
+      <h2 id="yay-title">Tiny progress detected!</h2>
+      <p id="yay-sub"></p>
+      <button class="btn" id="yay-btn" type="button">YAY!</button>
+    </div>
+  </div>
+</div>
+
 <nav class="tabs" role="tablist" aria-label="Fin sections">
   <div class="in">
+    <span class="start" aria-hidden="true">★ start</span>
     <button class="tab" id="tab-tasks" role="tab" aria-selected="true" data-view="tasks">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>
+      <svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M0 0h8v8H0zm1 1v6h6V1zm1 3h1v1h1V4h1V3h1v1H5v1H4v1H3V5H2z" fill-rule="evenodd"/></svg>
       Tasks <span class="badge" id="tasks-badge" hidden></span>
     </button>
     <button class="tab" id="tab-budget" role="tab" aria-selected="false" data-view="budget">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+      <svg viewBox="0 0 8 8" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1h2v1H3v1h3v1h1v2H6v1H5v1H3V7H1V6h4V5H2V4H1V2h1V1h1z"/></svg>
       Budget <span class="badge" id="budget-badge" hidden>!</span>
     </button>
+    <span class="clock" id="clock" aria-hidden="true"></span>
   </div>
 </nav>
 
@@ -287,6 +451,48 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 
   $("today").textContent = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const tick = () => { $("clock").textContent = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }); };
+  tick(); setInterval(tick, 20000);
+
+  /* ---------- pixel art ---------- */
+  const PAL = { o: "#4b3a6e", c: "#ffd27f", p: "#ff9cc2", w: "#ffffff", r: "#e8609f", g: "#b8b2c8" };
+  function pixels(svg, rows) {
+    const w = Math.max(...rows.map((r) => r.length));
+    svg.setAttribute("viewBox", "0 0 " + w + " " + rows.length);
+    svg.setAttribute("shape-rendering", "crispEdges");
+    let out = "";
+    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (PAL[ch]) out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + PAL[ch] + '"/>'; }));
+    svg.innerHTML = out;
+  }
+  const CAT = [
+    "..o........o..",
+    ".oco......oco.",
+    ".occoooooocco.",
+    "occcccccccccco",
+    "occoccccccocco",
+    "occwccccccwcco",
+    "opccccooccccpo",
+    "occccoccocccco",
+    ".occcccccccco.",
+    "..oooccccooo..",
+  ];
+  const HEART = [".oo.oo.", "orrorro", "orrrrwo", ".orrro.", "..oro..", "...o..."];
+  const HEART_LOW = [".oo.oo.", "oggoggo", "oggwggo", ".ogwgo.", "..ogo..", "...o..."];
+  pixels($("yay-cat"), CAT);
+
+  /* ---------- "tiny progress detected" pop-up ---------- */
+  let yayReturn = null;
+  function celebrate(t) {
+    const left = tasks.filter((x) => !x.done).length;
+    $("yay-sub").textContent = "\u201c" + t.text + "\u201d is done. " + (left === 0 ? "Your list is clear!" : left + (left === 1 ? " task" : " tasks") + " to go.");
+    yayReturn = document.activeElement;
+    $("yay").hidden = false;
+    $("yay-btn").focus();
+  }
+  function closeYay() { $("yay").hidden = true; if (yayReturn && yayReturn.focus) yayReturn.focus(); }
+  $("yay-btn").addEventListener("click", closeYay);
+  $("yay").addEventListener("click", (e) => { if (e.target === $("yay")) closeYay(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("yay").hidden) closeYay(); });
 
   /* ---------- tabs (deep-link with #tasks or #budget) ---------- */
   function show(view) {
@@ -377,6 +583,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
         await mcp.callTool(SHEETS, "update_values", { spreadsheetId: SHEET_ID, range: "To-Do!A" + t.row + ":G" + t.row,
           values: [[!t.done, null, null, null, null, null, t.done ? "" : isoToday()]] });
         t.done = !t.done; sheetMsg(""); renderTasks();
+        if (t.done) celebrate(t);
       }
     } catch (err) { sheetMsg(err && err.code === "server_unavailable" ? "Not sure that saved. Fin is reloading the list." : explain(err)); }
     busy = false;
@@ -442,6 +649,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
     $("gap-label").textContent = gap < 0 ? "Short before payday" : "Left after bills";
     $("gap-amt").textContent = money(Math.abs(gap));
     $("gap-amt").className = "big num " + (gap < 0 ? "bad" : "good");
+    pixels($("gap-pix"), gap < 0 ? HEART_LOW : HEART);
     const st = $("gap-status");
     if (gap < 0) { st.className = "status bad"; st.textContent = "Shortfall"; }
     else if (gap < 100) { st.className = "status warn"; st.textContent = "Tight"; }
