@@ -114,8 +114,7 @@ li.task.done .t-text { color: var(--muted); text-decoration: line-through; }
 .pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
 .pill.high { background: var(--bad-soft); color: var(--bad); }
 .pill.bot { background: var(--line); color: var(--ink); }
-.del { flex: none; border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 4px; }
-.del:hover { color: var(--bad); }
+.sheet-link { color: var(--accent); font-weight: 600; }
 .linkbtn { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer; align-self: flex-start; }
 .empty { text-align: center; color: var(--muted); padding: 28px 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; }
 .empty b { display: block; color: var(--ink); font-family: var(--f-display); font-size: 17px; margin-bottom: 4px; }
@@ -198,6 +197,8 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
       </div>
     </form>
 
+    <p class="offline" id="sheet-msg" hidden></p>
+
     <div class="progress" id="progress" hidden>
       <span id="progress-text"></span>
       <div class="bar"><i id="progress-bar"></i></div>
@@ -205,12 +206,13 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
 
     <div class="empty" id="tasks-empty">
       <b>Nothing on your list yet</b>
-      Type a task above and tap Add. Tasks FinBot flags for you in its morning audit show up here too.
+      Type a task above and tap Add. Your list lives in the Fin To-Do Tracker sheet, and tasks your finance agents give you show up here too.
     </div>
 
     <ul class="tasks" id="open-list"></ul>
     <button class="linkbtn" id="toggle-done" type="button" hidden></button>
     <ul class="tasks" id="done-list" hidden></ul>
+    <p class="foot"><span id="synced"></span> · <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo/edit" target="_blank" rel="noopener">Open the sheet</a></p>
   </section>
 
   <!-- ===== BUDGET ===== -->
@@ -298,29 +300,87 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
   if (initial !== "tasks" && initial !== "budget") { try { initial = localStorage.getItem("fin.view") || "tasks"; } catch (e) { initial = "tasks"; } }
   show(initial === "budget" ? "budget" : "tasks");
 
-  /* ---------- tasks ---------- */
-  let db = null, tasks = [], showDone = false, priority = "normal", readOnly = false;
+  /* ---------- tasks: live from the "Fin To-Do Tracker" Google Sheet ---------- */
+  const SHEETS = "Google Sheets";
+  const SHEET_ID = "1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo";
+  const READ_RANGE = "To-Do!A2:H500";
+  const FROM_SHEET = { Urgent: "high", Normal: "normal", Someday: "low" };
+  const TO_SHEET = { high: "Urgent", normal: "Normal", low: "Someday" };
+  let mcp = null, tasks = [], showDone = false, priority = "normal", sheetOk = false, busy = false, syncedAt = 0;
   const RANK = { high: 0, normal: 1, low: 2 };
+  const isoToday = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+  const dueDate = (s) => { if (!s) return null; const d = parseDate(s) || new Date(s + " " + new Date().getFullYear()); return isNaN(d) ? null : d; };
+
+  function sheetMsg(text) { $("sheet-msg").textContent = text || ""; $("sheet-msg").hidden = !text; }
+  function explain(err) {
+    const c = err && err.code;
+    if (c === "needs_reauth") return "Reconnect Google Sheets in claude.ai Settings → Connectors to see your tasks.";
+    if (c === "server_not_connected" || c === "selection_required") return "Add the Google Sheets connector in claude.ai Settings → Connectors to see your tasks.";
+    if (c === "not_in_manifest" || c === "approval_required" || c === "consent_required") return "Fin needs your OK to use Google Sheets. Tap Allow when claude.ai asks, then reload.";
+    if (c === "not_granted" || c === "capability_disabled" || c === "capability_removed") return "Open Fin on claude.ai while signed in to see your tasks.";
+    return "Couldn't reach your task sheet just now. Fin will try again in a minute.";
+  }
+  const retract = (c) => ["needs_reauth", "server_not_connected", "selection_required", "not_in_manifest", "approval_required", "consent_required", "blocked_by_policy"].includes(c);
+
+  function fromRows(values) {
+    const out = [];
+    (values || []).forEach((r, i) => {
+      const text = String(r[1] || "").trim();
+      if (!text) return;
+      out.push({
+        row: i + 2, text,
+        done: String(r[0]).toUpperCase() === "TRUE",
+        priority: FROM_SHEET[r[2]] || "normal",
+        due: r[3] || "",
+        source: r[4] === "Me" ? "me" : "finbot",
+        id: r[7] || "",
+      });
+    });
+    return out;
+  }
 
   for (const c of document.querySelectorAll(".chip")) c.addEventListener("click", () => {
     priority = c.dataset.p;
     for (const o of document.querySelectorAll(".chip")) o.setAttribute("aria-pressed", String(o === c));
   });
-  $("task-text").addEventListener("input", () => { $("add-btn").disabled = !$("task-text").value.trim() || !db || readOnly; });
+  const canAdd = () => !!$("task-text").value.trim() && !!mcp && sheetOk && !busy;
+  $("task-text").addEventListener("input", () => { $("add-btn").disabled = !canAdd(); });
   $("add-form").addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (!canAdd()) return;
     const text = $("task-text").value.trim();
-    if (!text || !db || readOnly) return;
-    $("task-text").value = ""; $("add-btn").disabled = true;
+    const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 24) || "task";
+    busy = true; $("add-btn").disabled = true; $("add-btn").textContent = "Adding…";
     try {
-      await db.collection("tasks").add({ text, done: false, priority, source: "me", createdAt: Date.now() });
-    } catch (err) { handleWriteError(err, text); }
+      await mcp.callTool(SHEETS, "append_values", { spreadsheetId: SHEET_ID, range: "To-Do!A1:H1",
+        values: [[false, text, TO_SHEET[priority], "", "Me", isoToday(), "", "me-" + slug + "-" + Date.now().toString(36)]] });
+      $("task-text").value = "";
+      sheetMsg("");
+    } catch (err) {
+      sheetMsg(err && (err.code === "server_unavailable" || err.code === "upstream_error")
+        ? "Not sure the task was saved. Check the sheet before adding it again." : explain(err));
+    }
+    busy = false; $("add-btn").textContent = "Add"; $("add-btn").disabled = !canAdd();
+    refresh();
   });
   $("toggle-done").addEventListener("click", () => { showDone = !showDone; renderTasks(); });
 
-  function handleWriteError(err, text) {
-    if (err && err.code === "invalid_argument") { readOnly = true; $("add-form").hidden = true; }
-    if (text) $("task-text").value = text;
+  async function toggleTask(t, btn) {
+    if (!mcp || busy) return;
+    busy = true; btn.disabled = true;
+    try {
+      // Make sure the row still holds this task before writing to it.
+      const check = await mcp.callTool(SHEETS, "get_values", { spreadsheetId: SHEET_ID, range: "To-Do!B" + t.row }, { cache: false });
+      const now = (((check.payload || {}).values || [[""]])[0] || [""])[0];
+      if (String(now).trim() !== t.text) { sheetMsg("The sheet changed. Showing the latest list, try again."); }
+      else {
+        await mcp.callTool(SHEETS, "update_values", { spreadsheetId: SHEET_ID, range: "To-Do!A" + t.row + ":G" + t.row,
+          values: [[!t.done, null, null, null, null, null, t.done ? "" : isoToday()]] });
+        t.done = !t.done; sheetMsg(""); renderTasks();
+      }
+    } catch (err) { sheetMsg(err && err.code === "server_unavailable" ? "Not sure that saved. Fin is reloading the list." : explain(err)); }
+    busy = false;
+    refresh();
   }
 
   function taskItem(t) {
@@ -330,35 +390,27 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
     cb.type = "button";
     cb.setAttribute("aria-label", (t.done ? "Mark not done: " : "Mark done: ") + t.text);
     cb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
-    cb.disabled = readOnly;
-    cb.addEventListener("click", () => {
-      db.doc("tasks/" + t.id).update(t.done ? { done: false, doneAt: null } : { done: true, doneAt: Date.now() }).catch(handleWriteError);
-    });
+    cb.addEventListener("click", () => toggleTask(t, cb));
     const body = el("div", "t-body");
     body.append(el("div", "t-text", t.text));
     const meta = el("div", "t-meta");
     if (t.priority === "high") meta.append(el("span", "pill high", "Urgent"));
     if (t.source === "finbot") meta.append(el("span", "pill bot", "From FinBot"));
-    const due = parseDate(t.due);
-    if (due) meta.append(el("span", "pill", "Due " + fmtDay(due)));
+    if (t.due) {
+      const d = dueDate(t.due);
+      meta.append(el("span", "pill", "Due " + (d ? fmtDay(d) : t.due)));
+    }
     if (meta.childNodes.length) body.append(meta);
     li.append(cb, body);
-    if (!readOnly) {
-      const del = el("button", "del", "×");
-      del.type = "button";
-      del.setAttribute("aria-label", "Delete task: " + t.text);
-      del.addEventListener("click", () => db.doc("tasks/" + t.id).delete().catch(handleWriteError));
-      li.append(del);
-    }
     return li;
   }
 
   function renderTasks() {
     const open = tasks.filter((t) => !t.done).sort((a, b) =>
       (RANK[a.priority] ?? 1) - (RANK[b.priority] ?? 1) ||
-      ((parseDate(a.due) || Infinity) - (parseDate(b.due) || Infinity)) ||
-      (b.createdAt || 0) - (a.createdAt || 0));
-    const done = tasks.filter((t) => t.done).sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0));
+      ((dueDate(a.due) || Infinity) - (dueDate(b.due) || Infinity)) ||
+      a.row - b.row);
+    const done = tasks.filter((t) => t.done).sort((a, b) => b.row - a.row);
     $("open-list").replaceChildren(...open.map(taskItem));
     $("done-list").replaceChildren(...done.map(taskItem));
     $("tasks-empty").hidden = tasks.length > 0;
@@ -452,21 +504,40 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: grid; grid-template-co
     $("budget-badge").hidden = !(gap < 0 || alerts.some((a) => a.priority === "high"));
   }
 
-  /* ---------- connect to the store ---------- */
+  /* ---------- connect ---------- */
+  function refresh() {
+    if (mcp && mcp.invalidate) mcp.invalidate(SHEETS, "get_values", { spreadsheetId: SHEET_ID, range: READ_RANGE }).catch(() => {});
+  }
+  function syncedLabel() {
+    if (!syncedAt) return;
+    const s = Math.round((Date.now() - syncedAt) / 1000);
+    $("synced").textContent = "Synced with your sheet " + (s < 60 ? "just now" : Math.round(s / 60) + " min ago");
+  }
+  setInterval(syncedLabel, 30000);
+
   renderTasks();
   (async () => {
-    db = window.claude && window.claude.use ? await window.claude.use("db") : null;
-    if (!db) { $("offline").hidden = false; $("add-form").hidden = true; return; }
-    try {
-      const user = await window.claude.use("user");
-      const can = user && user.can ? await user.can("data.write") : null;
-      if (can === false) { readOnly = true; $("add-form").hidden = true; }
-    } catch (e) {}
-    $("add-btn").disabled = !$("task-text").value.trim() || readOnly;
-    db.collection("tasks").onSnapshot((snap) => {
-      tasks = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((t) => typeof t.text === "string");
-      renderTasks();
-    }, () => { $("offline").hidden = false; });
+    const claude = window.claude && window.claude.use ? window.claude : null;
+    mcp = claude ? await claude.use("mcp") : null;
+    if (!mcp) { sheetMsg(explain({ code: "not_granted" })); }
+    else {
+      sheetMsg("Loading your tasks from Google Sheets…");
+      mcp.watchTool(SHEETS, "get_values", { spreadsheetId: SHEET_ID, range: READ_RANGE }, (ev) => {
+        if (ev.type === "data") {
+          tasks = fromRows((ev.result.payload || {}).values);
+          sheetOk = true; sheetMsg("");
+          syncedAt = (ev.result.cache && ev.result.cache.storedAt) || Date.now();
+          syncedLabel();
+          renderTasks();
+        } else {
+          sheetMsg(explain(ev.error));
+          if (retract(ev.error && ev.error.code)) { tasks = []; sheetOk = false; renderTasks(); }
+        }
+        $("add-btn").disabled = !canAdd();
+      }, { refetchInterval: 60000 });
+    }
+    const db = claude ? await claude.use("db") : null;
+    if (!db) { $("offline").hidden = false; return; }
     db.doc("budget/latest").onSnapshot((snap) => renderBudget(snap.exists ? snap.data() : null), () => { $("offline").hidden = false; });
   })();
 })();
