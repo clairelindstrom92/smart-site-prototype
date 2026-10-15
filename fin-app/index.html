@@ -212,6 +212,36 @@ li.task[data-p="high"]:not(.done) .t-text::before { content: "♥ "; color: var(
 .today-note:empty { display: none; }
 .pill.over { background: var(--bad); color: #fff; }
 
+.area-pick { display: flex; align-items: center; gap: 8px; }
+#task-area { font: inherit; font-size: 14px; color: var(--ink); background: var(--win); border: 2px solid var(--edge); border-radius: 3px; padding: 4px 6px; box-shadow: inset 1px 1px 0 var(--lo); max-width: 100%; }
+.viewbar { align-items: center; gap: 6px; padding-block: 5px; }
+.seg { font-family: var(--f-pixel); font-size: 12px; padding: 2px 9px; cursor: pointer; color: var(--ink); background: var(--win); border: 1px solid var(--edge); border-radius: 3px; box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--lo); }
+.seg[aria-pressed="true"] { background: var(--bar); color: var(--accent); box-shadow: inset 1px 1px 0 var(--lo), inset -1px -1px 0 var(--hi); }
+.folders { display: flex; flex-direction: column; gap: 8px; }
+.folders:empty { display: none; }
+details.folder { border: 2px solid var(--edge); border-radius: 4px; background: var(--win); box-shadow: inset 1px 1px 0 var(--hi); }
+details.folder > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-family: var(--f-pixel); font-size: 15px; background: var(--win-2); }
+details.folder > summary::-webkit-details-marker { display: none; }
+details.folder[open] > summary { border-bottom: 2px solid var(--edge); }
+details.folder > summary .fico { width: 18px; height: 15px; flex: none; image-rendering: pixelated; }
+details.folder > summary .fname { flex: 1; min-width: 0; }
+details.folder > summary .fcount { font-family: var(--f-num); font-size: 18px; color: var(--muted); }
+details.folder > summary .furg { font-family: var(--f-pixel); font-size: 11px; color: var(--bad); }
+details.folder.hot > summary { color: var(--bad); }
+details.folder ul.tasks { border: 0; box-shadow: none; }
+.fsub { margin: 0; padding: 6px 10px 0; font-size: 12px; color: var(--muted); }
+.pill.area { background: var(--good-soft); color: var(--good); }
+.btn.ghost { background: var(--win); color: var(--accent); width: 100%; }
+.ask { display: flex; flex-direction: column; gap: 8px; }
+.ask[hidden] { display: none; }
+.ask-out { background: var(--win); border: 2px solid var(--edge); border-radius: 4px; padding: 10px 12px; box-shadow: inset 2px 2px 0 var(--lo); display: flex; flex-direction: column; gap: 8px; }
+.ask-out[hidden] { display: none; }
+.ask-out ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.ask-out li b { display: block; }
+.ask-out li span { color: var(--muted); font-size: 13px; }
+.ask-out .tip { margin: 0; font-size: 13px; color: var(--note-ink); background: var(--note); padding: 6px 8px; }
+.ask-out .small { margin: 0; font-size: 11px; color: var(--muted); }
+
 /* sticky note */
 .note { align-self: flex-start; transform: rotate(-3deg); background: var(--note); color: var(--note-ink);
   font-family: var(--f-pixel); font-size: 16px; line-height: 1.2; padding: 12px 14px 14px; width: 150px;
@@ -331,6 +361,13 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
           <input id="task-text" type="text" placeholder="What do you need to do?" aria-label="New task" maxlength="200">
           <button class="btn" id="add-btn" type="submit" disabled>Add</button>
         </div>
+        <label class="area-pick"><span class="label">Area</span>
+          <select id="task-area">
+            <option value="">Choose…</option>
+            <option>Bills &amp; Cash</option><option>Taxes &amp; IRS</option><option>Move</option><option>Debts</option>
+            <option>Health</option><option>Family &amp; Butters</option><option>Accounts</option>
+          </select>
+        </label>
         <div class="chips" role="group" aria-label="Priority">
           <span class="label">Priority</span>
           <button type="button" class="chip" data-p="high" aria-pressed="false">Urgent</button>
@@ -345,12 +382,20 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
       <div class="win-body">
         <ul class="tasks" id="today-list"></ul>
         <p class="today-note" id="today-note"></p>
+        <div class="ask" id="ask" hidden>
+          <button class="btn ghost" id="ask-btn" type="button">✦ Ask Fin what to do first</button>
+          <div class="ask-out" id="ask-out" hidden aria-live="polite"></div>
+        </div>
       </div>
     </div>
 
     <div class="win">
       <div class="titlebar"><svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill="#fff" d="M1 0h6v8H1zM2 2h4v1H2zm0 2h4v1H2zm0 2h3v1H2z" fill-rule="evenodd"/></svg><span class="t" id="list-title">My To-Dos</span><span class="wbtns" aria-hidden="true"><span>_</span><span>□</span><span>×</span></span></div>
-      <div class="menubar" aria-hidden="true"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>H</u>elp</span></div>
+      <div class="menubar viewbar" role="group" aria-label="Group tasks">
+        <span class="label">View</span>
+        <button type="button" class="seg" data-group="date" aria-pressed="true">By date</button>
+        <button type="button" class="seg" data-group="area" aria-pressed="false">By area</button>
+      </div>
       <div class="win-body">
         <p class="msg" id="sheet-msg" hidden></p>
         <div class="progress" id="progress" hidden>
@@ -361,8 +406,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
           <b>Nothing on your list yet</b>
           Type a task above and tap Add. Your list lives in the Fin To-Do Tracker sheet, and tasks your finance agents give you show up here too.
         </div>
-        <ul class="tasks" id="open-list"></ul>
-        <button class="linkbtn" id="show-all" type="button" hidden></button>
+        <div class="folders" id="open-list"></div>
         <button class="linkbtn" id="toggle-done" type="button" hidden></button>
         <ul class="tasks" id="done-list" hidden></ul>
         <p class="foot"><span id="synced"></span> · <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo/edit" target="_blank" rel="noopener">Open the sheet</a></p>
@@ -524,9 +568,11 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
   /* ---------- tasks: live from the "Fin To-Do Tracker" Google Sheet ---------- */
   const SHEETS = "Google Sheets";
   const SHEET_ID = "1ctsfqfgdw50pZdDeeKNYfB9m7uWbnj3ybtAge-g4lpo";
-  const READ_RANGE = "To-Do!A2:H";
-  const LIST_LIMIT = 12;
-  let showAll = false;
+  const READ_RANGE = "To-Do!A2:I";
+  const MOVE_IN = "2026-11-13";
+  const AREAS = ["Bills & Cash", "Taxes & IRS", "Move", "Debts", "Health", "Family & Butters", "Accounts"];
+  let groupBy = "date", payday = null, budgetDoc = null;
+  try { if (localStorage.getItem("fin.group") === "area") groupBy = "area"; } catch (e) {}
   const FROM_SHEET = { Urgent: "high", Normal: "normal", Someday: "low" };
   const TO_SHEET = { high: "Urgent", normal: "Normal", low: "Someday" };
   let mcp = null, tasks = [], showDone = false, priority = "normal", sheetOk = false, busy = false, syncedAt = 0;
@@ -567,6 +613,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
         due: r[3] || "",
         source: r[4] === "Me" ? "me" : "finbot",
         agent: String(r[4] || "FinBot"),
+        area: AREAS.includes(r[8]) ? r[8] : "",
         id: r[7] || "",
       });
     });
@@ -589,8 +636,8 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
       // Write right below the last task. (Appending would land below every empty checkbox row.)
       const col = await mcp.callTool(SHEETS, "get_values", { spreadsheetId: SHEET_ID, range: "To-Do!B2:B" }, { cache: false });
       const row = (((col.payload || {}).values) || []).length + 2;
-      await mcp.callTool(SHEETS, "update_values", { spreadsheetId: SHEET_ID, range: "To-Do!A" + row + ":H" + row,
-        values: [[false, text, TO_SHEET[priority], "", "Me", isoToday(), "", "me-" + slug + "-" + Date.now().toString(36)]] });
+      await mcp.callTool(SHEETS, "update_values", { spreadsheetId: SHEET_ID, range: "To-Do!A" + row + ":I" + row,
+        values: [[false, text, TO_SHEET[priority], "", "Me", isoToday(), "", "me-" + slug + "-" + Date.now().toString(36), $("task-area").value]] });
       $("task-text").value = "";
       sheetMsg("");
     } catch (err) {
@@ -601,7 +648,12 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     refresh();
   });
   $("toggle-done").addEventListener("click", () => { showDone = !showDone; renderTasks(); });
-  $("show-all").addEventListener("click", () => { showAll = !showAll; renderTasks(); });
+  for (const b of document.querySelectorAll(".seg")) b.addEventListener("click", () => {
+    groupBy = b.dataset.group;
+    try { localStorage.setItem("fin.group", groupBy); } catch (e) {}
+    renderTasks();
+  });
+  const openFolders = {};
 
   async function toggleTask(t, btn) {
     if (!mcp || busy) return;
@@ -634,6 +686,7 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     body.append(el("div", "t-text", t.text));
     const meta = el("div", "t-meta");
     if (t.priority === "high") meta.append(el("span", "pill high", "Urgent"));
+    if (t.area && groupBy !== "area") meta.append(el("span", "pill area", t.area));
     if (t.source === "finbot") meta.append(el("span", "pill bot", "From " + t.agent));
     if (t.due) {
       const d = dueDate(t.due);
@@ -645,25 +698,95 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     return li;
   }
 
+  /* ---------- organizing ---------- */
+  const daysUntil = (d) => Math.round((startOfDay(d) - startOfDay(new Date())) / DAY);
+  // How pressing a task is: overdue and due-soon first, then urgent, then everything else.
+  function score(t) {
+    const d = dueDate(t.due);
+    let s = 0;
+    if (d) { const n = daysUntil(d); s += n < 0 ? 100 : n === 0 ? 90 : n === 1 ? 80 : n <= 3 ? 60 : n <= 7 ? 35 : 10; }
+    if (t.priority === "high") s += d ? 25 : 45;
+    if (t.priority === "low") s -= 20;
+    return s;
+  }
+  const byPressing = (a, b) => score(b) - score(a) || ((dueDate(a.due) || Infinity) - (dueDate(b.due) || Infinity)) || a.row - b.row;
+
+  function dateBucket(t) {
+    const d = dueDate(t.due);
+    if (!d) return t.priority === "high" ? "Urgent, no date" : "No date yet";
+    const n = daysUntil(d);
+    if (n < 0) return "Overdue";
+    if (n === 0) return "Today";
+    if (n === 1) return "Tomorrow";
+    if (n <= 6) return "This week";
+    if (payday && startOfDay(d) <= startOfDay(payday)) return "Before payday";
+    if (startOfDay(d) <= startOfDay(parseDate(MOVE_IN))) return "Before move-in";
+    return "Later";
+  }
+  const DATE_ORDER = ["Overdue", "Today", "Tomorrow", "This week", "Urgent, no date", "Before payday", "Before move-in", "Later", "No date yet"];
+  const DATE_SUB = {
+    "Before payday": () => payday ? "Due by payday, " + fmtDay(payday) : "",
+    "Before move-in": () => "Due by move-in day, " + fmtDay(parseDate(MOVE_IN)),
+    "Urgent, no date": () => "Urgent, but no agent gave a due date",
+    "No date yet": () => "No due date",
+  };
+  const OPEN_BY_DEFAULT = ["Overdue", "Today", "Tomorrow", "This week", "Urgent, no date"];
+
+  function folderIcon(hot) {
+    const c = hot ? "#ff9cc2" : "#ffd27f";
+    return '<svg class="fico" viewBox="0 0 12 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#4b3a6e" d="M0 1h5v1h7v8H0z"/><path fill="' + c + '" d="M1 2h3v1h7v6H1z"/></svg>';
+  }
+
+  function folder(key, name, items, sub) {
+    const det = document.createElement("details");
+    const urgent = items.filter((t) => t.priority === "high").length;
+    const hot = groupBy === "date" && (name === "Overdue" || name === "Today");
+    det.className = "folder" + (hot ? " hot" : "");
+    det.open = key in openFolders ? openFolders[key] : (groupBy === "date" ? OPEN_BY_DEFAULT.includes(name) : false);
+    det.addEventListener("toggle", () => { openFolders[key] = det.open; });
+    const sm = document.createElement("summary");
+    sm.innerHTML = folderIcon(hot);
+    sm.append(el("span", "fname", name), urgent && !hot ? el("span", "furg", urgent + " urgent") : "", el("span", "fcount", String(items.length)));
+    det.append(sm);
+    if (sub) det.append(el("p", "fsub", sub));
+    const ul = el("ul", "tasks");
+    ul.replaceChildren(...items.map(taskItem));
+    det.append(ul);
+    return det;
+  }
+
   function renderTasks() {
-    const open = tasks.filter((t) => !t.done).sort((a, b) =>
-      (RANK[a.priority] ?? 1) - (RANK[b.priority] ?? 1) ||
-      ((dueDate(a.due) || Infinity) - (dueDate(b.due) || Infinity)) ||
-      a.row - b.row);
+    const open = tasks.filter((t) => !t.done).sort(byPressing);
     const done = tasks.filter((t) => t.done).sort((a, b) => b.row - a.row);
-    // Today: the 3 open tasks due soonest (urgent first on ties, and urgent undated tasks before other undated ones).
-    const today = open.slice().sort((a, b) =>
-      ((dueDate(a.due) || Infinity) - (dueDate(b.due) || Infinity)) ||
-      (RANK[a.priority] ?? 1) - (RANK[b.priority] ?? 1) || a.row - b.row).slice(0, 3);
-    const rest = open.filter((t) => !today.includes(t));
+    // Today: the 3 most pressing open tasks.
+    const today = open.slice(0, 3);
+    const rest = open.slice(3);
     $("today-win").hidden = today.length === 0;
     $("today-list").replaceChildren(...today.map(taskItem));
     $("today-note").textContent = rest.length ? "Just these for today. The other " + rest.length + " can wait." : "";
+    $("ask").hidden = !sample || today.length === 0;
     $("list-title").textContent = today.length ? "Everything else" : "My To-Dos";
-    const shown = showAll ? rest : rest.slice(0, LIST_LIMIT);
-    $("show-all").hidden = rest.length <= LIST_LIMIT;
-    $("show-all").textContent = showAll ? "Show fewer" : "Show all " + rest.length + " tasks";
-    $("open-list").replaceChildren(...shown.map(taskItem));
+    for (const b of document.querySelectorAll(".seg")) b.setAttribute("aria-pressed", String(b.dataset.group === groupBy));
+
+    const groups = new Map();
+    for (const t of rest) {
+      const k = groupBy === "area" ? (t.area || "Other") : dateBucket(t);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(t);
+    }
+    const order = groupBy === "area" ? [...AREAS, "Other"] : DATE_ORDER;
+    const folders = [];
+    for (const k of order) {
+      const items = groups.get(k);
+      if (!items) continue;
+      let sub = groupBy === "date" ? (DATE_SUB[k] ? DATE_SUB[k]() : "") : "";
+      if (groupBy === "area") {
+        const left = items.length, all = tasks.filter((t) => (t.area || "Other") === k).length;
+        sub = (all - left - today.filter((t) => (t.area || "Other") === k).length) + " of " + all + " done";
+      }
+      folders.push(folder(groupBy + ":" + k, k, items, sub));
+    }
+    $("open-list").replaceChildren(...folders);
     $("done-list").replaceChildren(...done.map(taskItem));
     $("tasks-empty").hidden = tasks.length > 0;
     $("progress").hidden = tasks.length === 0;
@@ -677,8 +800,54 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
     $("tasks-badge").textContent = urgent;
   }
 
+  /* ---------- Ask Fin (Claude reads the list and suggests where to start) ---------- */
+  let sample = null, asking = false;
+  function budgetSummary() {
+    const b = budgetDoc;
+    if (!b) return "No budget figures yet.";
+    const due = (Array.isArray(b.due) ? b.due : []).map((d) => "- " + d.name + ": $" + d.amount + (d.date ? " due " + d.date : "") + (d.status ? " (" + d.status + ")" : "")).join("\n");
+    return "Cash available: $" + b.cashAvailable + ". Next payday: " + (b.payday || "unknown") + ".\nBills due before payday:\n" + due;
+  }
+  async function askFin() {
+    if (!sample || asking) return;
+    asking = true;
+    const out = $("ask-out");
+    out.hidden = false; out.replaceChildren(el("p", "small", "Fin is thinking…"));
+    $("ask-btn").disabled = true;
+    const list = tasks.filter((t) => !t.done).sort(byPressing).slice(0, 25)
+      .map((t) => "- [" + TO_SHEET[t.priority] + (t.due ? ", due " + t.due : "") + (t.area ? ", " + t.area : "") + "] " + t.text).join("\n");
+    const prompt = "You help Claire decide what to do first today. Today is " + new Date().toDateString() + ".\n\n" +
+      "Her open tasks, most pressing first:\n" + list + "\n\nHer money right now:\n" + budgetSummary() + "\n\n" +
+      "Pick the 3 things she should do first today, in order. Prefer deadlines in the next 48 hours, anything that stops a shutoff, fee or returned payment, and quick calls that unblock other tasks. " +
+      "Use only the facts above; do not invent amounts or dates. Write warmly and plainly, like a kind friend who is good with money. " +
+      'Reply with JSON only: {"steps":[{"do":"short instruction, under 12 words","why":"one short sentence"}],"tip":"one encouraging sentence, under 15 words"}';
+    try {
+      const fn = sample.json || null;
+      let data;
+      if (fn) data = await sample.json(prompt, { modelTier: "default" });
+      else { const r = await sample(prompt, { modelTier: "default" }); data = JSON.parse(String(r.text).replace(/^[^{]*/, "").replace(/[^}]*$/, "")); }
+      const steps = (data && Array.isArray(data.steps)) ? data.steps.slice(0, 3) : [];
+      if (!steps.length) throw { code: "empty" };
+      const ol = el("ol");
+      for (const st of steps) { const li = el("li"); li.append(el("b", null, String(st.do || "")), el("span", null, String(st.why || ""))); ol.append(li); }
+      out.replaceChildren(ol);
+      if (data.tip) out.append(el("p", "tip", "♡ " + String(data.tip)));
+      out.append(el("p", "small", "Suggested by Claude from your list and budget. Double-check amounts in your bank app."));
+    } catch (err) {
+      const c = err && err.code;
+      if (c === "not_granted") { $("ask").hidden = true; sample = null; }
+      out.replaceChildren(el("p", "small", c === "rate_limited" ? "Fin needs a short break. Try again in a minute."
+        : c === "not_granted" ? "Ask Fin needs your OK to use Claude." : "Fin couldn't come up with a plan just now. Try again in a bit."));
+    }
+    asking = false; $("ask-btn").disabled = false;
+  }
+  $("ask-btn").addEventListener("click", askFin);
+
   /* ---------- budget ---------- */
   function renderBudget(b) {
+    budgetDoc = b || null;
+    payday = b ? parseDate(b.payday) : null;
+    renderTasks();
     if (!b) { $("budget-empty").hidden = false; $("budget").hidden = true; $("budget-badge").hidden = true; return; }
     $("budget-empty").hidden = true; $("budget").hidden = false;
     const accounts = Array.isArray(b.accounts) ? b.accounts : [];
@@ -789,6 +958,8 @@ nav.tabs .in { max-width: 560px; margin: 0 auto; display: flex; gap: 6px; align-
         $("add-btn").disabled = !canAdd();
       }, { refetchInterval: 60000 });
     }
+    sample = claude ? await claude.use("sample") : null;
+    renderTasks();
     const db = claude ? await claude.use("db") : null;
     if (!db) { $("offline").hidden = false; return; }
     db.doc("budget/latest").onSnapshot((snap) => renderBudget(snap.exists ? snap.data() : null), () => { $("offline").hidden = false; });

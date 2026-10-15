@@ -7,7 +7,7 @@ A phone home-screen app with two tabs:
 
 ## Where the data lives
 
-This repository is public, so **no financial data is stored here**. `index.html` is only the page source. It runs as a private claude.ai artifact and keeps the budget in that artifact's private database. Tasks live in the owner-only Google Sheet, columns A Done, B Task, C Priority, D Due, E Source, F Added, G Completed, H Fin ID.
+This repository is public, so **no financial data is stored here**. `index.html` is only the page source. It runs as a private claude.ai artifact and keeps the budget in that artifact's private database. Tasks live in the owner-only Google Sheet, columns A Done, B Task, C Priority, D Due, E Source, F Added, G Completed, H Fin ID, I Area.
 
 | Path | Contents |
 | --- | --- |
